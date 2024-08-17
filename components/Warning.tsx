@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { AiOutlineWarning } from "react-icons/ai";
 
-export default function Warning({ onNext }) {
+interface Props {
+  onNext: () => void;  
+}
+
+export default function Warning({ onNext } : Props) {
   const [read, setRead] = useState(false);
 
   return (

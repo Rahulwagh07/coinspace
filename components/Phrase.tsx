@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import { generateMnemonic } from "bip39";
 import toast from "react-hot-toast";
 
-export default function Phrase({ onNext }) {
+interface Props {
+  onNext: () => void;  
+}
+export default function Phrase({ onNext } : Props) {
   const [mnemonic, setMnemonic] = useState<string[]>([]);
   const [read, setRead] = useState(false);
   const [loading, setLoading] = useState(true);

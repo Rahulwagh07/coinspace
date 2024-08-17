@@ -49,7 +49,7 @@ export async function getEthereumBalance(publicKey: string): Promise<number> {
     });
 
     const balanceHex = response.data.result;
-    const balance = ethers.utils.formatEther(balanceHex);
+    const balance = ethers.formatEther(balanceHex);
     return parseFloat(balance);
   } catch (error) {
     console.error('Error fetching ETH balance:', error);

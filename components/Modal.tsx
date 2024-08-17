@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { getSolanaBalance, sendSolanaTransaction } from "@/lib/transactions";
 
 interface  ModalProps {
@@ -32,9 +31,11 @@ const Modal: React.FC<ModalProps> = ({ publicKey, privateKey, onClose }) => {
       const signature = await sendSolanaTransaction(privateKey, recipient, parseFloat(amount));
       const updatedBalance = await getSolanaBalance(publicKey);
       setStatus(`Transaction confirmed with signature: ${signature}. New Balance: ${updatedBalance} SOL`);
-    } catch (error) {
+    } catch (error: unknown ) {
       console.error('Error sending SOL:', error);
-      setStatus(`Transaction failed: ${error.message}`);
+      if(error instanceof Error){
+        setStatus(`Transaction failed: ${error.message}`);
+      }
     }
   };
   

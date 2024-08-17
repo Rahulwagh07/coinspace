@@ -37,9 +37,6 @@ export default function RootLayout({
             },
             success: {
               duration: 3000,
-              theme: {
-                primary: 'black',
-              },
             },
           }}/>
           <ThemeProvider
