@@ -65,6 +65,8 @@ export function CreateWallet() {
     if (network === 'eth') {
       try {
         generateEthWallet(mnemonic);
+        toast.success("ETH Wallet created successfully!");
+        setShowWalletOptions(false);
         fetchWallets();
       } catch (error) {
         console.log("Error creating ETH wallet", error);
@@ -72,6 +74,8 @@ export function CreateWallet() {
     } else if (network === 'sol') {
       try {
         generateSolWallet(mnemonic);
+        toast.success("Solana Wallet created successfully!");
+        setShowWalletOptions(false);
         fetchWallets();
       } catch (error) {
         console.log("Error creating SOL wallet", error);
@@ -105,7 +109,7 @@ export function CreateWallet() {
                 <span
                   onClick={() => setNetwork('eth')}
                   className={`flex cursor-pointer font-semibold items-center justify-center gap-4 p-2 
-                             rounded-lg ${network === "eth" ? "bg-blue-100 dark:text-blue-500" : "bg-gray-100 text-gray-700"}
+                             rounded-lg ${network === "eth" ? "bg-blue-100 dark:text-red-500" : "bg-gray-100 text-gray-700"}
                              dark:bg-gray-700 dark:text-gray-300`}
                 >
                   Ethereum
@@ -113,7 +117,7 @@ export function CreateWallet() {
                 <span
                   onClick={() => setNetwork('sol')}
                   className={`flex cursor-pointer font-semibold items-center justify-center gap-4 p-2 
-                      rounded-lg ${network === "sol" ? "bg-blue-100 dark:text-blue-500" : "bg-gray-100 text-gray-700"}
+                      rounded-lg ${network === "sol" ? "bg-blue-100 dark:text-red-500" : "bg-gray-100 text-gray-700"}
                       dark:bg-gray-700 dark:text-gray-300`}
                 >
                   Solana
@@ -146,7 +150,7 @@ export function CreateWallet() {
         )}
       </div>
       <div className="container py-4 lg:w-10/12">
-        <span className="scroll-m-20 p-4 text-xl bg-slate-900 xs:text-gray-700 font-semibold tracking-tight lg:text-2xl mb-8">
+        <span className="p-4 text-xl bg-slate-900 xs:text-gray-700 font-semibold tracking-tight lg:text-2xl mb-8">
           Your Wallets
         </span>
         <div>

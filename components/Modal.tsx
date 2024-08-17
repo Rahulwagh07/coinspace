@@ -65,7 +65,7 @@ const Modal: React.FC<ModalProps> = ({ publicKey, privateKey, onClose }) => {
               className="text-gray-900 bg-white border rounded-xl   border-gray-300 focus:outline-none
              hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium text-sm px-5 py-2.5 me-2 mb-2 dark:bg-white-800 dark:text-gray-800 dark:border-gray-600 dark:hover:bg-gray-400 dark:hover:border-gray-600 dark:focus:ring-gray-700">Send</button>
             </div>
-        {status && <p className="mt-4 text-gray-900 dark:text-gray-200">{status}</p>}
+        {status && <p className="mt-4 break-words  text-gray-900 dark:text-gray-200">{status}</p>}
       </div>
     </div>
   );
