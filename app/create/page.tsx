@@ -14,7 +14,7 @@ function Page() {
 
   return (
     <div className="flex max-h-screen  bg-background flex-col items-center justify-center ">
-      <Redirect/>
+      {/* <Redirect/> */}
       {currentStep === 0 && <Warning onNext={goToNextStep} />}
       {currentStep === 1 && <Phrase onNext={goToNextStep} />}
       {currentStep === 2 && <Password/>}
