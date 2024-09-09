@@ -27,24 +27,24 @@ export default function RootLayout({
           fontSans.variable
         )}>
           <Toaster
-          position="top-right"
-          toastOptions={{
-            className: '',
-            duration: 5000,
-            style: {
-              background: '#0f172a',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-            },
-          }}/>
+            position="top-right"
+            toastOptions={{
+              className: '',
+              duration: 5000,
+              style: {
+                background: '#0f172a',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+              },
+            }}/>
           <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
           {children}
         </ThemeProvider>
         </body>

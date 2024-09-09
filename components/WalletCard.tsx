@@ -16,9 +16,10 @@ interface WalletCardProps {
   balance: number;  
   index: number;
   onDelete: (publicKey: string) => void;
+  setTransactionSuccess: (success: boolean) => void;
 }
 
-const WalletCard: React.FC<WalletCardProps> = ({ type, wallet, balance, index, onDelete }) => {
+const WalletCard: React.FC<WalletCardProps> = ({ type, wallet, balance, index, onDelete, setTransactionSuccess}) => {
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
@@ -38,7 +39,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ type, wallet, balance, index, o
         <AccordionTrigger className="flex justify-between items-center">
            <span>Wallet {index + 1} ({type})</span>
         </AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent className="bg-gray-900 p-4 rounded-xl border">
           <div className="flex justify-between">
             <p className="mb-2 overflow-hidden">Public Key: {wallet.publicKey}</p>
             <MdDelete 
@@ -74,12 +75,13 @@ const WalletCard: React.FC<WalletCardProps> = ({ type, wallet, balance, index, o
               publicKey={wallet.publicKey}
               privateKey={wallet.privateKey}
               onClose={() => setIsModalOpen(false)}
+              setTransactionSuccess={setTransactionSuccess}
             />
           )}
           {isDeleteConfirmationOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="bg-white p-4 rounded-lg shadow-lg">
-                <p className="mb-4">Are you sure you want to delete this wallet?</p>
+              <div className="bg-gray-700 p-12 rounded-xl  border">
+                <p className="mb-4 text-red-400 text-lg">Are you sure you want to delete this wallet?</p>
                 <div className="flex justify-end gap-2">
                   <Button 
                     variant={"outline"} 

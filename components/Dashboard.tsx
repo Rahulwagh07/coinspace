@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { Button } from "./ui/button";
 import { useRouter } from 'next/navigation'
 import { MnemonicDialog } from "./MnemonicDialog";
+import Loader from "./Loader";
 
 interface Wallet {
   publicKey: string;
@@ -15,18 +16,28 @@ interface Wallet {
   balance: number;
 }
 
-export function CreateWallet() {
+export function Dashboard() {
   const [network, setNetwork] = useState<'eth' | 'sol' | null>(null);
   const [showWalletOptions, setShowWalletOptions] = useState(false);
-  const [showMnemonic, setShowMnemonic] = useState(false); // State for showing mnemonic
   const [ethWallets, setEthWallets] = useState<Wallet[]>([]);
   const [solWallets, setSolWallets] = useState<Wallet[]>([]);
   const [ethBalances, setEthBalances] = useState<{ [key: string]: number }>({});
   const [solBalances, setSolBalances] = useState<{ [key: string]: number }>({});
-  const router = useRouter();
+  let mnemonic = "";
 
+
+  if (typeof window !== "undefined") {
+    mnemonic = window.localStorage.getItem("mn") || "";
+  }
+
+  const mnemonicWords = mnemonic.split(" ");
+  const router = useRouter();
+  const [transactionSuccess, setTransactionSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
   const fetchWallets = async () => {
-    const storedEthWallets = JSON.parse(localStorage.getItem("eth_wallets") || "[]");
+    setLoading(true);
+    const storedEthWallets = JSON.parse(window.localStorage.getItem("eth_wallets") || "[]");
     setEthWallets(storedEthWallets);
 
     const ethBalancesTemp: { [key: string]: number } = {};
@@ -40,7 +51,7 @@ export function CreateWallet() {
     }
     setEthBalances(ethBalancesTemp);
 
-    const storedSolWallets = JSON.parse(localStorage.getItem("sol_wallets") || "[]");
+    const storedSolWallets = JSON.parse(window.localStorage.getItem("sol_wallets") || "[]");
     setSolWallets(storedSolWallets);
 
     const solBalancesTemp: { [key: string]: number } = {};
@@ -52,21 +63,26 @@ export function CreateWallet() {
         console.error("Error fetching SOL balance:", error);
       }
     }
+    setLoading(false);
     setSolBalances(solBalancesTemp);
   };
 
   useEffect(() => {
+    console.log("Transaction Success Updated:", transactionSuccess);
     fetchWallets();
-  }, []);
+  }, [transactionSuccess]);
 
   const handleGenerateWallet = async () => {
-    const mnemonic = localStorage.getItem("mn") || "";
     if (!mnemonic) {
       toast.success("Mnemonic not found");
       router.push("/");
       return;
     }
-
+    if(!network){
+      alert("Plase choose Blockchain");
+      setShowWalletOptions(true);
+      return;
+    }
     if (network === 'eth') {
       try {
         await generateEthWallet(mnemonic);
@@ -94,19 +110,20 @@ export function CreateWallet() {
 
     if (type === 'eth') {
       updatedWallets = ethWallets.filter(wallet => wallet.publicKey !== publicKey);
-      localStorage.setItem('eth_wallets', JSON.stringify(updatedWallets));
+      window.localStorage.setItem('eth_wallets', JSON.stringify(updatedWallets));
       setEthWallets(updatedWallets);
     } else if (type === 'sol') {
       updatedWallets = solWallets.filter(wallet => wallet.publicKey !== publicKey);
-      localStorage.setItem('sol_wallets', JSON.stringify(updatedWallets));
+      window.localStorage.setItem('sol_wallets', JSON.stringify(updatedWallets));
       setSolWallets(updatedWallets);
     }
 
     toast.success(`${type.toUpperCase()} Wallet deleted successfully!`);
   };
 
-  const mnemonic = localStorage.getItem("mn") || "";
-  const mnemonicWords = mnemonic.split(" ");
+  if(loading){
+    return  <Loader/>;
+  }
 
   return (
     <div className="flex flex-col w-9/12 mx-auto items-center justify-center border rounded-xl border-slate-800 p-4">
@@ -125,16 +142,6 @@ export function CreateWallet() {
       
       <div className="container py-4 lg:w-10/12">
         <div>
-          {ethWallets.map((wallet, index) => (
-            <WalletCard
-              key={`eth-${wallet.publicKey}`}
-              type="ETH"
-              wallet={wallet}
-              balance={ethBalances[wallet.publicKey] || 0}
-              onDelete={(publicKey) => deleteWallet('eth', publicKey)}
-              index={index}
-            />
-          ))}
           {solWallets.map((wallet, index) => (
             <WalletCard
               key={`sol-${wallet.publicKey}`}
@@ -143,57 +150,60 @@ export function CreateWallet() {
               balance={solBalances[wallet.publicKey] || 0}
               onDelete={(publicKey) => deleteWallet('sol', publicKey)}
               index={index}
+              setTransactionSuccess={setTransactionSuccess}
+            />
+          ))}
+          {ethWallets.map((wallet, index) => (
+            <WalletCard
+              key={`eth-${wallet.publicKey}`}
+              type="ETH"
+              wallet={wallet}
+              balance={ethBalances[wallet.publicKey] || 0}
+              onDelete={(publicKey) => deleteWallet('eth', publicKey)}
+              index={index}
+              setTransactionSuccess={setTransactionSuccess}
             />
           ))}
         </div>
       </div>
 
       {showWalletOptions && (
-        <div className="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-50 border rounded-lg">
-          <div className="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Select Network</h3>
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
-              Choose the network for which you want to generate a wallet.
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-700 p-12 rounded-xl border">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Select Blockchain</h3>
+            <p className="text-lg  dark:text-gray-300 mb-4">
+              Choose the Blockchain for which you want to create a wallet.
             </p>
             <div className="grid gap-4 mb-4">
               <span
                 onClick={() => setNetwork('eth')}
-                className={`flex cursor-pointer font-semibold items-center justify-center gap-4 p-2 
-                            rounded-lg ${network === "eth" ? "bg-blue-100 dark:text-red-500" : "bg-gray-100 text-gray-700"}
-                            dark:bg-gray-700 dark:text-gray-300`}
+                className={`flex cursor-pointer font-semibold items-center justify-center border gap-4 p-2 bg-blue-600
+                            rounded-xl ${network === "eth" && "text-red-400"} `}
               >
                 Ethereum
               </span>
               <span
                 onClick={() => setNetwork('sol')}
-                className={`flex cursor-pointer font-semibold items-center justify-center gap-4 p-2 
-                    rounded-lg ${network === "sol" ? "bg-blue-100 dark:text-red-500" : "bg-gray-100 text-gray-700"}
-                    dark:bg-gray-700 dark:text-gray-300`}
-              >
+                className={`flex cursor-pointer font-semibold items-center justify-center border gap-4 p-2  bg-blue-600
+                  rounded-xl ${network === "sol" && "text-red-400"} `}
+                >
                 Solana
               </span>
             </div>
             <div className="flex justify-end gap-4 mt-4">
-              <button
+              <Button 
+                variant={"outline"} 
                 onClick={() => setShowWalletOptions(false)}
-                type="button"
-                className="py-2.5 px-5 me-2 mb-2 rounded-xl text-sm font-medium text-gray-900 focus:outline-none 
-                  bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 
-                  focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 
-                  dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-400"
+                className="border rounded-xl"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button 
                 onClick={handleGenerateWallet}
-                type="button"
-                className="text-gray-900 bg-white border rounded-xl border-gray-300 focus:outline-none 
-                    hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium text-sm px-5 py-2.5 
-                    me-2 mb-2 dark:bg-white-800 dark:text-gray-800 dark:border-gray-600 
-                    dark:hover:bg-gray-400 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                className="border rounded-xl"
               >
-                Add
-              </button>
+                Create
+              </Button>
             </div>
           </div>
         </div>
